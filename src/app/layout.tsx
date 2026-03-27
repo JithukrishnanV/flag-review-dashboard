@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Flag Review Oversight Dashboard",
+  title: "Flag Review Oversight Dashboards",
   description: "Case flag review tool",
 };
 
