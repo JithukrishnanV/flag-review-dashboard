@@ -29,11 +29,17 @@ export default function Home() {
       });
   }, []);
 
+  const [flagError, setFlagError] = useState<string | null>(null);
+
   const loadFlags = useCallback((caseItem: Case) => {
     setLoadingFlags(true);
+    setFlagError(null);
     fetch(`/api/cases/${caseItem.id}/flags`)
       .then(async (res) => {
-        if (!res.ok) throw new Error("Failed to fetch flags");
+        if (!res.ok) {
+          const text = await res.text().catch(() => "No text");
+          throw new Error(`Failed to fetch flags: ${res.status} ${res.statusText} - ${text}`);
+        }
         return res.json();
       })
       .then((data) => {
@@ -42,6 +48,7 @@ export default function Home() {
       })
       .catch((err) => {
         console.error("Failed to fetch flags:", err);
+        setFlagError(err.message || String(err));
         setFlags([]);
         setLoadingFlags(false);
       });
@@ -112,6 +119,10 @@ export default function Home() {
 
               {loadingFlags ? (
                 <p className="text-sm text-gray-400">Loading flags...</p>
+              ) : flagError ? (
+                <div className="p-4 bg-red-50 text-red-600 rounded whitespace-pre-wrap font-mono text-sm">
+                  Error loading flags: {flagError}
+                </div>
               ) : flags.length === 0 ? (
                 <p className="text-sm text-gray-400">No flags for this case.</p>
               ) : (
